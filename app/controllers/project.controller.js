@@ -17,7 +17,8 @@ exports.create = (project) => {
         });
 };
 
-exports.findAll = () => {
+exports.findAll = (req, res, next) => {
+    console.log('ask for findAll');
     return Project.findAll({
         include: [
             {
@@ -34,8 +35,9 @@ exports.findAll = () => {
         ],
     })
 
-        .then((project) => {
-            return project;
+        .then((projects) => {
+            console.log(">> OK trouve",projects);
+            res.send(projects);
         })
         .catch((err) => {
             console.log(">> Erreur pour trouver le projet: ", err);
