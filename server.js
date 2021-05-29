@@ -2,11 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-//const path = __dirname + '/app/views/';
-
 const app = express();
-
-//app.use(express.static(path));
 
 let corsOptions = {
     origin: 'http://localhost:8081'
@@ -23,11 +19,11 @@ const UserController = require("./app/controllers/user.controller");
 
 const run = async () => {
     const user1 = await UserController.create({
-        name: "moi",
-        firstName: "fmoi",
-        email: "fmoi@gmail.com",
+        name: "admin",
+        firstName: "first admin",
+        email: "leo.gicquel.23@gmail.com",
         mdp: "",
-        role: 0
+        role: 3
     });
 
     const user2 = await UserController.create({

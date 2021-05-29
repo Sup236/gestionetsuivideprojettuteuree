@@ -5,6 +5,9 @@ const User = db.user;
 exports.create = (user) => {
     return User.create({
         name: user.name,
+        firstName: user.firstName,
+        email: user.email,
+        role: user.role,
     })
         .then((user) => {
             console.log(">> Creation de l'utilisateur: " + JSON.stringify(user, null, 2));
@@ -79,3 +82,13 @@ exports.addProject = (userId, projectId) => {
             console.log(">> Erreur lors de l'ajout du projet à l'utilisateur ", err);
         });
 };
+
+exports.getRole = (userId) =>{
+    return User.findByPk(userId).then((user) => {
+        if (user !== 0){
+            return user;
+        }
+    }).catch((err) => {
+        console.log(">> Problème pour trouver le role de l'utilisateur", err);
+    })
+}
