@@ -4,10 +4,11 @@
   "description": "Gestion et suivi de projet tuteuree, Backend: NodeJs, Frontend: VueJs, Année scolaire: 2020/2021, Developpeur: Léo Gicquel S4-C1, IUT BELFORT MONTBELIARD",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "devStart": "nodemon server.js"
   },
   "keywords": [
     "nodejs",
+    "nodemon",
     "jwt",
     "authentication",
     "express",
