@@ -1,22 +1,18 @@
 module.exports = app => {
     const projects = require("../controllers/project.controller");
-    const users = require("../controllers/user.controller");
 
-    var router = require("express").Router();
+    app.get("/enseignant", projects.findAll);
 
-    router.post("/", projects.create);
+    app.post("/projects", projects.create);
 
-    router.get("/", projects.findAll);
+    app.get("/archive", projects.findAllArchive);
 
-    router.get("/archive", projects.findAllArchive);
+    app.put("/projects/:id", projects.update);
 
-    router.put("/:id", projects.update);
+    app.get("/projects/:id", projects.findOne);
 
-    router.get("/:id", projects.findOne);
+    app.delete("/projects/:id", projects.delete);
 
-    router.delete("/:id", projects.delete);
-
-    router.delete("/", projects.deleteAll);
-
-    app.use('/projects', router);
+    app.delete("/projects", projects.deleteAll);
+    
 }

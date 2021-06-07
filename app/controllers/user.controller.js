@@ -2,12 +2,13 @@ const db = require("../models");
 const Project = db.projects;
 const User = db.user;
 
-exports.create = (user) => {
+exports.create = (req, res, hashedPassword) => {
     return User.create({
-        name: user.name,
-        firstName: user.firstName,
-        email: user.email,
-        role: user.role,
+        name: req.body.name,
+        firstName: req.body.firstName,
+        email: req.body.email,
+        role: req.body.role,
+        password: hashedPassword
     })
         .then((user) => {
             console.log(">> Creation de l'utilisateur: " + JSON.stringify(user, null, 2));
@@ -18,7 +19,7 @@ exports.create = (user) => {
         });
 };
 
-exports.findAll = () => {
+exports.findAll = (req, res) => {
     return User.findAll({
         include: [
             {
@@ -32,15 +33,15 @@ exports.findAll = () => {
         ],
     })
         .then((users) => {
-            return users;
+            res.send(users);
         })
         .catch((err) => {
             console.log(">> Erreur pour trouver les utilisateurs: ", err);
         });
 };
 
-exports.findById = (id) => {
-    return User.findByPk(id, {
+exports.findById = (req, res) => {
+    return User.findByPk(req.body.id, {
         include: [
             {
                 model: Project,
@@ -53,11 +54,18 @@ exports.findById = (id) => {
         ],
     })
         .then((users) => {
-          return users;
+          res.send(users);
         })
         .catch((err) => {
             console.log(">> Erreur pour trouver l'utilisateur: ", err);
         });
+};
+
+exports.findByName = (req, res) => {
+    const name = req.body.name;
+    return User.findOne({
+        where: {name: name},
+    })
 };
 
 exports.addProject = (userId, projectId) => {
@@ -83,6 +91,56 @@ exports.addProject = (userId, projectId) => {
         });
 };
 
+exports.update = (req,res) => {
+    const id = req.params.id;
+
+    User.update(req.body, {
+        where: { id: id }
+    })
+        .then(num => {
+            if (num === 1){
+                res.send({
+                    message: "L'utilisateur a bien été mis à jour"
+                });
+            }else{
+                res.send({
+                    message: `L'utilisateur avec l'id ${id} n'a pas été trouvé, il se peut qu'il n'existe pas`
+                })
+            }
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: "Erreur lors de la mise à jour de l'utilisateur d'id "+id
+            }, err)
+        })
+};
+
+exports.delete = (req, res) => {
+    const id = req.body.id;
+
+    User.destroy({
+        where: { id: id }
+    })
+        .then(num => {
+            if (num === 1) {
+                res.send({
+                    message: "suppression réussi"
+                });
+            }else{
+                res.send({
+                    message: "Problème lors de la suppression l'utilisateur d'id"+id+"n'existe peut-être pas"
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Erreur lors de la suppression de l'utilisateur d'id "+id, err
+            })
+        })
+}
+
+
+
 exports.getRole = (userId) =>{
     return User.findByPk(userId).then((user) => {
         if (user !== 0){
@@ -91,4 +149,5 @@ exports.getRole = (userId) =>{
     }).catch((err) => {
         console.log(">> Problème pour trouver le role de l'utilisateur", err);
     })
-}
+};
+

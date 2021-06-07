@@ -2,15 +2,16 @@ const db = require("../models");
 const Project = db.projects;
 const User = db.user;
 
-exports.create = (project) => {
+exports.create = (req, res) => {
     return Project.create({
-        sujet: project.sujet,
-        annee: project.annee,
-        etat: project.etat,
+        sujet: req.body.sujet,
+        annee: req.body.annee,
+        user: req.body.user,
+        etat: req.body.etat,
     })
         .then((project) => {
             console.log(">> Création du projet: " + JSON.stringify(project, null, 4));
-            return project;
+            res.send(project);
         })
         .catch((err) => {
             console.log("Erreur lors de la creation du projet: ", err);
@@ -24,13 +25,13 @@ exports.findAll = (req, res, next) => {
             {
                 model: User,
                 as: "users",
-                attributes: ["id", "name", "firstName", "email", "mdp", "role"],
-                through: {
-                    attributes: [],
-                },
+                attributes: ["id", "name", "firstName", "email", "password", "role"],
                 // through: {
-                //     attributes: ["user_id", "project_user"],
-                // }
+                //     attributes: [],
+                // },
+                through: {
+                    attributes: ["user_id", "project_user"],
+                }
             },
         ],
     })
@@ -57,13 +58,13 @@ exports.findOne = (req, res) => {
         });
 };
 
-exports.findById = (id) => {
-    return Project.findByPk(id, {
+exports.findById = (req, res) => {
+    return Project.findByPk(req.body.id, {
         include: [
             {
                 model: User,
                 as: "users",
-                attributes: ["id", "name", "firstName", "email", "mdp", "role"],
+                attributes: ["id", "name", "firstName", "email", "password", "role"],
                 through: {
                     attributes: [],
                 },
@@ -74,7 +75,7 @@ exports.findById = (id) => {
         ],
     })
         .then((project) => {
-            return project;
+            res.send(project);
         })
         .catch((err) => {
             console.log(">> Impossible de trouver le projet: ",err);
@@ -106,6 +107,7 @@ exports.update = (req, res) => {
 };
 
 exports.delete = (req, res) => {
+    const id = req.body.id;
     Project.destroy({
         where: { id: id }
     })
@@ -122,7 +124,7 @@ exports.delete = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Problème lors de la suppression du projet d'id " + id
+                message: "Problème lors de la suppression du projet d'id " + id, err
             });
         });
 };

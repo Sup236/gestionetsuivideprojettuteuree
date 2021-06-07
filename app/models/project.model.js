@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         },
 
         user: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
 
         etat: {
