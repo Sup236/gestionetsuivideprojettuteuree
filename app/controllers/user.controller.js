@@ -143,7 +143,7 @@ exports.delete = (req, res) => {
 
 exports.getRole = (userId) =>{
     return User.findByPk(userId).then((user) => {
-        if (user !== 0){
+        if (user > -1 && user < 6){
             return user;
         }
     }).catch((err) => {

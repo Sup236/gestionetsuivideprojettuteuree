@@ -1,46 +1,19 @@
 module.exports = app => {
+    const authJwt = require("../middleware/authJwt");
     const users = require("../controllers/user.controller");
-    const bcrypt = require('bcryptjs');
-    const { authUser } = require('../middleware/basicAuth')
-    const { authRole } = require('../middleware/basicAuth')
+    const auth = require('../controllers/auth.controller');
 
-    app.get('/admin', authUser, authRole(3), users.findAll);
-
-    app.post('/signUp', async (req, res) => {
-        console.log(req.body);
-        try{
-            const salt = await bcrypt.genSalt();
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-            users.create(req, res, hashedPassword);
-
-            res.status(201).send();
-        }catch {
-            res.status(500).send();
-        }
-
+    app.use(function (req, res, next) {
+        res.header(
+            "Access-Control-Allow-Headers",
+            "x-access-token, Origin, Content-Type, Accept"
+        );
+        next();
     });
 
-    app.post('/signIn', async (req, res) => {
-        try{
-           const user = users.findByName(req);
-           user.then((users) => {
-               if (bcrypt.compare(req.body.password, users.password)){
-                   res.send(users);
-                   // voir pour les autorisations problème
-               }else{
-                   res.redirect('/signIn').send({
-                       message: "Mot de passe incorrecte"
-                   });
-               }
-           })
-               .catch((err) => {
-                   console.log(">> L'utilisateur avec le nom: "+req.body.name+" n'a pas été trouvée: ", err);
-               });
+    app.post('/signUp', auth.signUp);
 
-        }catch(e) {
-            console.log(e);
-            res.status(500).send(e);
-        }
-    });
+    app.post('/signIn', auth.signIn);
+
+    app.get('/admin',[authJwt.verifyToken, authJwt.isAdmin], users.findAll);
 };
