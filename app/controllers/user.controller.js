@@ -94,43 +94,25 @@ exports.addProject = (userId, projectId) => {
 exports.update = (req,res) => {
     const id = req.params.id;
 
-    User.update(req.body, {
+    User.update({
         where: { id: id }
     })
         .then(num => {
-            if (num === 1){
-                res.send({
-                    message: "L'utilisateur a bien été mis à jour"
-                });
-            }else{
-                res.send({
-                    message: `L'utilisateur avec l'id ${id} n'a pas été trouvé, il se peut qu'il n'existe pas`
-                })
-            }
+            res.status(200).send(num)
         })
         .catch((err) => {
-            res.status(500).send({
-                message: "Erreur lors de la mise à jour de l'utilisateur d'id "+id
-            }, err)
+            res.status(500).send("erreur lors de la mise a jour de l'utilisateur d'id: "+id,err)
         })
 };
 
 exports.delete = (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
 
     User.destroy({
         where: { id: id }
     })
-        .then(num => {
-            if (num === 1) {
-                res.send({
-                    message: "suppression réussi"
-                });
-            }else{
-                res.send({
-                    message: "Problème lors de la suppression l'utilisateur d'id"+id+"n'existe peut-être pas"
-                });
-            }
+        .then(() => {
+            res.status(200).send("Suppression réussi")
         })
         .catch(err => {
             res.status(500).send({
@@ -143,11 +125,18 @@ exports.delete = (req, res) => {
 
 exports.getRole = (userId) =>{
     return User.findByPk(userId).then((user) => {
-        if (user > -1 && user < 6){
-            return user;
+        if (user.role > -1 && user.role < 6){
+            return user.role;
         }
     }).catch((err) => {
         console.log(">> Problème pour trouver le role de l'utilisateur", err);
     })
 };
 
+exports.setRole = (userId, newRole) => {
+    return User.findByPk(userId).then((user) => {
+        user.role = newRole;
+    }).catch((err) => {
+        console.log(">> Problème lors de l'edition du role", err);
+    })
+};
