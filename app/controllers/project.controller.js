@@ -19,23 +19,18 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = (req, res, next) => {
-    console.log('ask for findAll');
     return Project.findAll({
         include: [
             {
                 model: User,
                 as: "users",
                 attributes: ["id", "name", "firstName", "email", "password", "role"],
-                // through: {
-                //     attributes: [],
-                // },
                 through: {
-                    attributes: ["user_id", "project_user"],
+                    attributes: ["user_id", "project_id"],
                 }
             },
         ],
     })
-
         .then((projects) => {
             console.log(">> OK trouve",projects);
             res.send(projects);
@@ -66,11 +61,8 @@ exports.findById = (req, res) => {
                 as: "users",
                 attributes: ["id", "name", "firstName", "email", "password", "role"],
                 through: {
-                    attributes: [],
-                },
-                /*through: {
                     attributes: ["user_id", "project_user"],
-                }*/
+                }
             },
         ],
     })
@@ -86,10 +78,20 @@ exports.update = (req, res) => {
     const id = req.params.id;
 
     Project.update(req.body, {
-        where: { id: id }
+        where: { id: id },
+        include: [
+            {
+                model: User,
+                as: "users",
+                attributes: ["id", "name", "firstName", "email", "password", "role"],
+                through: {
+                    attributes: ["user_id", "project_user"],
+                }
+            },
+        ],
     })
-        .then(num => {
-            if (num === 1){
+        .then((result) => {
+            if (result > -1){
                 res.send({
                     message: `Le project a été mis à jour.`
                 });
@@ -107,20 +109,13 @@ exports.update = (req, res) => {
 };
 
 exports.delete = (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
+
     Project.destroy({
         where: { id: id }
     })
-        .then(num => {
-            if (num === 1) {
-                res.send({
-                    message: "Le projet a été supprimer"
-                });
-            } else {
-                res.send({
-                    message: `le projet avec l'id ${id} ne peut pas être supprimer. Peut-être qu'il n'existe pas`
-                });
-            }
+        .then(() => {
+            res.status(200).send("Suppression réussi")
         })
         .catch(err => {
             res.status(500).send({
@@ -129,24 +124,10 @@ exports.delete = (req, res) => {
         });
 };
 
-exports.deleteAll = (req, res) => {
-    Project.destroy({
-        where: {},
-        truncate: false
-    })
-        .then(num => {
-            res.send({ message: `${num} Projets ont été supprimer` });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Une erreur s'est produit lors de la suppression de tous les projets"
-            });
-        });
-};
 
 exports.findAllArchive = (req, res) => {
     Project.findAll({ where: { etat: true } })
-        .then(data => {
+        .then((data) => {
             res.send(data);
         })
         .catch(err => {
@@ -155,3 +136,12 @@ exports.findAllArchive = (req, res) => {
             });
         });
 };
+
+exports.setArchive = (req, res) => {
+    return User.findByPk(req.body.id).then((user) => {
+        user.etat = user.etat !== true;
+        res.send(user);
+    }).catch((err) => {
+        console.log(">> Problème lors de la mise en archive ou lors de la sortie d'archive", err)
+    })
+}

@@ -17,9 +17,15 @@ module.exports = app => {
 
     app.get('/admin',/*[authJwt.verifyToken, authJwt.isAdmin],*/ users.findAll);
 
+    app.get('/enseignant/add', users.findAllEtudiant);
+
     app.post('/admin', auth.signUp);
+
+    app.get('/admin:name', users.findByName);
 
     app.delete('/admin:id', users.delete);
 
-    app.post('/admin:id', users.update);
+    app.put('/admin:id', users.update);
+
+    app.post("/enseignant", users.addInProject);
 };

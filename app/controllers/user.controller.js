@@ -40,6 +40,28 @@ exports.findAll = (req, res) => {
         });
 };
 
+exports.findAllEtudiant = (req, res) => {
+    return User.findAll({
+        where: { role: 1 },
+        include: [
+            {
+                model: Project,
+                as: "projects",
+                attributes: ["id", "sujet", "annee", "etat"],
+                through: {
+                    attributes: ["user_id", "project_id"],
+                }
+            },
+        ],
+    })
+        .then((users) => {
+            res.send(users);
+        })
+        .catch((err) => {
+            console.log(">> Erreur pour trouver les utilisateurs: ", err);
+        });
+};
+
 exports.findById = (req, res) => {
     return User.findByPk(req.body.id, {
         include: [
@@ -63,14 +85,22 @@ exports.findById = (req, res) => {
 
 exports.findByName = (req, res) => {
     const name = req.body.name;
-    return User.findOne({
+    User.findOne({
         where: {name: name},
-    })
+    }).then((user) => {
+        res.send(user);
+    }).catch((err) => {
+        res.status(500).send({
+            message: err.message || "Erreur lors de la récupération de l'utilisateur"
+        });
+    });
 };
 
-exports.addProject = (userId, projectId) => {
+exports.addInProject = (userId, projectId) => {
+    console.log(userId);
     return User.findByPk(userId)
         .then((user) => {
+            console.log(userId);
             if (!user) {
                 console.log("l'utilisateur n'existe pas !");
                 return null;
@@ -81,7 +111,7 @@ exports.addProject = (userId, projectId) => {
                     return null;
                 }
 
-                user.addProject(project);
+                user.addInProject(project);
                 console.log(`Ajout du projet avec l'id: ${project.id} à l'utilisateur d'id: ${user.id}`);
                 return user;
             });
@@ -94,15 +124,25 @@ exports.addProject = (userId, projectId) => {
 exports.update = (req,res) => {
     const id = req.params.id;
 
-    User.update({
+    User.update(req.body,{
         where: { id: id }
     })
-        .then(num => {
-            res.status(200).send(num)
+        .then((result) => {
+            if (result > -1){
+                res.send({
+                    message: "Mise à jour réussi"
+                });
+            }else {
+                res.send({
+                    message: `L'utilisateur avec l'id: ${id} n'a pas pu être mis à jour, il n'existe peut-être pas`
+                });
+            }
         })
         .catch((err) => {
-            res.status(500).send("erreur lors de la mise a jour de l'utilisateur d'id: "+id,err)
-        })
+            res.status(500).send({
+                message: "erreur lors de la mise a jour de l'utilisateur d'id: "+id
+            });
+        });
 };
 
 exports.delete = (req, res) => {

@@ -3,16 +3,15 @@ module.exports = app => {
 
     app.get("/enseignant", projects.findAll);
 
-    app.post("/projects", projects.create);
+    app.post("/enseignant", projects.create);
+
+    app.put("/enseignant:id", projects.update);
+
+    app.get("/enseignant:id", projects.findOne);
+
+    app.delete("/enseignant:id", projects.delete);
 
     app.get("/archive", projects.findAllArchive);
 
-    app.put("/projects/:id", projects.update);
-
-    app.get("/projects/:id", projects.findOne);
-
-    app.delete("/projects/:id", projects.delete);
-
-    app.delete("/projects", projects.deleteAll);
-    
+    app.post("/enseignant:id", projects.setArchive);
 }
