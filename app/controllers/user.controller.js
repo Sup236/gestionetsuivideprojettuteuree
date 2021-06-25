@@ -27,7 +27,7 @@ exports.findAll = (req, res) => {
                 as: "projects",
                 attributes: ["id", "sujet", "annee", "etat"],
                 through: {
-                    attributes: [],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
@@ -49,7 +49,7 @@ exports.findAllEtudiant = (req, res) => {
                 as: "projects",
                 attributes: ["id", "sujet", "annee", "etat"],
                 through: {
-                    attributes: ["user_id", "project_id"],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
@@ -70,7 +70,7 @@ exports.findById = (req, res) => {
                 as: "projects",
                 attributes: ["id", "sujet", "annee", "etat"],
                 through: {
-                    attributes: [],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
@@ -96,24 +96,24 @@ exports.findByName = (req, res) => {
     });
 };
 
-exports.addInProject = (userId, projectId) => {
-    console.log(userId);
+exports.addInProject = (req, res, next) =>{
+    const userId = req.body.userId;
+    const projectId = req.body.projectId;
     return User.findByPk(userId)
         .then((user) => {
-            console.log(userId);
             if (!user) {
-                console.log("l'utilisateur n'existe pas !");
+                next(new Error("l'utilisateur n'existe pas !"))
                 return null;
             }
             return Project.findByPk(projectId).then((project) =>{
                 if (!project) {
-                    console.log("Le projet n'existe pas");
+                    next(new Error("Le projet n'existe pas"));
                     return null;
                 }
 
                 user.addInProject(project);
                 console.log(`Ajout du projet avec l'id: ${project.id} à l'utilisateur d'id: ${user.id}`);
-                return user;
+                res.send(user);
             });
         })
         .catch((err) => {

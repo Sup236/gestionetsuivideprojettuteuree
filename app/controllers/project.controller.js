@@ -6,7 +6,6 @@ exports.create = (req, res) => {
     return Project.create({
         sujet: req.body.sujet,
         annee: req.body.annee,
-        user: req.body.user,
         etat: req.body.etat,
     })
         .then((project) => {
@@ -26,13 +25,13 @@ exports.findAll = (req, res, next) => {
                 as: "users",
                 attributes: ["id", "name", "firstName", "email", "password", "role"],
                 through: {
-                    attributes: ["user_id", "project_id"],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
     })
         .then((projects) => {
-            console.log(">> OK trouve",projects);
+            //console.log(">> OK trouve",projects);
             res.send(projects);
         })
         .catch((err) => {
@@ -61,7 +60,7 @@ exports.findById = (req, res) => {
                 as: "users",
                 attributes: ["id", "name", "firstName", "email", "password", "role"],
                 through: {
-                    attributes: ["user_id", "project_user"],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
@@ -85,7 +84,7 @@ exports.update = (req, res) => {
                 as: "users",
                 attributes: ["id", "name", "firstName", "email", "password", "role"],
                 through: {
-                    attributes: ["user_id", "project_user"],
+                    attributes: ["users_id", "projects_id"],
                 }
             },
         ],
