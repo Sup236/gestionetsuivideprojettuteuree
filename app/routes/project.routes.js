@@ -12,6 +12,4 @@ module.exports = app => {
     app.delete("/enseignant:id", projects.delete);
 
     app.get("/enseignant/archive", projects.findAllArchive);
-
-    app.post("/enseignant:id", projects.setArchive);
 }

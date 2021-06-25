@@ -17,8 +17,11 @@ exports.create = (req, res) => {
         });
 };
 
-exports.findAll = (req, res, next) => {
+exports.findAll = (req, res) => {
     return Project.findAll({
+        where: {
+            etat: false,
+        },
         include: [
             {
                 model: User,
@@ -31,7 +34,6 @@ exports.findAll = (req, res, next) => {
         ],
     })
         .then((projects) => {
-            //console.log(">> OK trouve",projects);
             res.send(projects);
         })
         .catch((err) => {
@@ -125,7 +127,20 @@ exports.delete = (req, res) => {
 
 
 exports.findAllArchive = (req, res) => {
-    Project.findAll({ where: { etat: true } })
+    Project.findAll(
+        {
+            where: { etat: true },
+            include: [
+                {
+                    model: User,
+                    as: "users",
+                    attributes: ["id", "name", "firstName", "email", "password", "role"],
+                    through: {
+                        attributes: ["users_id", "projects_id"],
+                    }
+                },
+            ],
+        })
         .then((data) => {
             res.send(data);
         })
@@ -135,12 +150,3 @@ exports.findAllArchive = (req, res) => {
             });
         });
 };
-
-exports.setArchive = (req, res) => {
-    return User.findByPk(req.body.id).then((user) => {
-        user.etat = user.etat !== true;
-        res.send(user);
-    }).catch((err) => {
-        console.log(">> Problème lors de la mise en archive ou lors de la sortie d'archive", err)
-    })
-}

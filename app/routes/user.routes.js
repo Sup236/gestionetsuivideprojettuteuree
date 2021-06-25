@@ -27,5 +27,5 @@ module.exports = app => {
 
     app.put('/admin:id', users.update);
 
-    app.post("/enseignant/addUser", users.addInProject);
+    app.post("/enseignant/addUser", users.addProject);
 };

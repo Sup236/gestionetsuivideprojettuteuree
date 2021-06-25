@@ -96,24 +96,25 @@ exports.findByName = (req, res) => {
     });
 };
 
-exports.addInProject = (req, res, next) =>{
+exports.addProject = (req,res) =>{
     const userId = req.body.userId;
     const projectId = req.body.projectId;
+    console.log(projectId)
     return User.findByPk(userId)
         .then((user) => {
             if (!user) {
-                next(new Error("l'utilisateur n'existe pas !"))
+                console.log(new Error("l'utilisateur n'existe pas !"))
                 return null;
             }
             return Project.findByPk(projectId).then((project) =>{
                 if (!project) {
-                    next(new Error("Le projet n'existe pas"));
+                    console.log(new Error("Le projet n'existe pas"));
                     return null;
                 }
 
-                user.addInProject(project);
+                user.addProject(project);
                 console.log(`Ajout du projet avec l'id: ${project.id} à l'utilisateur d'id: ${user.id}`);
-                res.send(user);
+                return(user);
             });
         })
         .catch((err) => {
