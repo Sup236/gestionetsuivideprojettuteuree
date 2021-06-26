@@ -8,7 +8,7 @@ exports.create = (req, res, hashedPassword) => {
         firstName: req.body.firstName,
         email: req.body.email,
         role: req.body.role,
-        password: hashedPassword
+        password: hashedPassword,
     })
         .then((user) => {
             console.log(">> Creation de l'utilisateur: " + JSON.stringify(user, null, 2));
@@ -43,6 +43,28 @@ exports.findAll = (req, res) => {
 exports.findAllEtudiant = (req, res) => {
     return User.findAll({
         where: { role: 1 },
+        include: [
+            {
+                model: Project,
+                as: "projects",
+                attributes: ["id", "sujet", "annee", "etat"],
+                through: {
+                    attributes: ["users_id", "projects_id"],
+                }
+            },
+        ],
+    })
+        .then((users) => {
+            res.send(users);
+        })
+        .catch((err) => {
+            console.log(">> Erreur pour trouver les utilisateurs: ", err);
+        });
+};
+
+exports.findAllEnseignant = (req, res) => {
+    return User.findAll({
+        where: { role: 2 },
         include: [
             {
                 model: Project,
@@ -100,15 +122,16 @@ exports.addProject = (req,res) =>{
     const userId = req.body.userId;
     const projectId = req.body.projectId;
     console.log(projectId)
+    console.log(req.body)
     return User.findByPk(userId)
         .then((user) => {
             if (!user) {
-                console.log(new Error("l'utilisateur n'existe pas !"))
+                console.log(`l'utilisateur ${userId} n'existe pas !`)
                 return null;
             }
             return Project.findByPk(projectId).then((project) =>{
                 if (!project) {
-                    console.log(new Error("Le projet n'existe pas"));
+                    console.log("Le projet n'existe pas");
                     return null;
                 }
 

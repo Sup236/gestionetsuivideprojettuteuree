@@ -17,7 +17,9 @@ module.exports = app => {
 
     app.get('/admin',/*[authJwt.verifyToken, authJwt.isAdmin],*/ users.findAll);
 
-    app.get('/enseignant/add', users.findAllEtudiant);
+    app.get('/enseignant/getEtudiants', users.findAllEtudiant);
+
+    app.get('/enseignant/getEnseignants', users.findAllEnseignant);
 
     app.post('/admin', auth.signUp);
 
