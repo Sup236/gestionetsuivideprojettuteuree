@@ -121,8 +121,6 @@ exports.findByName = (req, res) => {
 exports.addProject = (req,res) =>{
     const userId = req.body.userId;
     const projectId = req.body.projectId;
-    console.log(projectId)
-    console.log(req.body)
     return User.findByPk(userId)
         .then((user) => {
             if (!user) {

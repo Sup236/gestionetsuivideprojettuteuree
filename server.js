@@ -30,6 +30,7 @@ const PORT = process.env.PORT || 8080;
 
 require("./app/routes/user.routes")(app)
 require("./app/routes/project.routes")(app)
+require("./app/routes/files.routes")(app)
 
 app.listen(PORT, () => {
     console.log(`Le serveur fonctionne sur le port: ${PORT}`);

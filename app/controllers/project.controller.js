@@ -150,3 +150,20 @@ exports.findAllArchive = (req, res) => {
             });
         });
 };
+
+exports.setEtat = (req, res) => {
+    const id = req.params.id;
+    Project.findByPk(id)
+        .then((project) => {
+        project.etat = !project.etat;
+        console.log(project.etat);
+        res.status(200).send(project.etat);
+        console.log(project.etat);
+    })
+        .catch(err => {
+            console.log(err);
+            res.status(500).send({
+                message: "Problème lors du changemant d'état du projet d'id "+ id, err
+            });
+        });
+}

@@ -11,5 +11,7 @@ module.exports = app => {
 
     app.delete("/enseignant:id", projects.delete);
 
+    app.post("/enseignant:id", projects.setEtat);
+
     app.get("/enseignant/archive", projects.findAllArchive);
 }
