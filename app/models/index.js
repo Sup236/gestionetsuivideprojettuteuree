@@ -23,15 +23,15 @@ db.projects = require("C:\\Users\\leogi\\Desktop\\PFE_Gestion du suivi des proje
 db.user = require("C:\\Users\\leogi\\Desktop\\PFE_Gestion du suivi des projets tuteurés\\Code Source\\gestionetsuivideprojettuteuree\\app\\models\\user.model.js")(sequelize,Sequelize);
 
 db.user.belongsToMany(db.projects, {
-    through: "project_user",
+    through: "projects_users",
     as: "projects",
-    foreignKey: "user_id",
+    foreignKey: "users_id",
 });
 
 db.projects.belongsToMany(db.user, {
-    through: "project_user",
+    through: "projects_users",
     as: "users",
-    foreignKey: "project_id"
+    foreignKey: "projects_id"
 });
 
 module.exports = db;

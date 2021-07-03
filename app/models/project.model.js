@@ -5,11 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         },
 
         annee: {
-            type: DataTypes.DATE
-        },
-
-        users: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DATEONLY
         },
 
         etat: {
