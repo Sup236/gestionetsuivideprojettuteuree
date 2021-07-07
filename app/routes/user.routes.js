@@ -13,7 +13,7 @@ module.exports = app => {
 
     app.post('/signUp', auth.signUp);
 
-    app.post('/signIn', /*auth.signIn*/);
+    app.post('/signIn', auth.signIn);
 
     app.get('/admin',/*[authJwt.verifyToken, authJwt.isAdmin],*/ users.findAll);
 

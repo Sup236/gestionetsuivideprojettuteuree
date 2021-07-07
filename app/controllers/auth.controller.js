@@ -1,6 +1,7 @@
 const db = require("../models");
 const config = require("../config/auth.config");
 const users = require('./user.controller');
+const User = db.user;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -20,13 +21,14 @@ exports.signUp = async (req, res) => {
 
 exports.signIn = (req, res) => {
     try{
-        const user = users.findByName(req);
-        var token = jwt.sign({ id: user.id }, config.secret, {
-            expiresIn: 86400 // 24 heures
-        });
+        User.findOne({
+            where: {name: req.body.name},
+        }).then((user) => {
+            let token = jwt.sign({ id: user.id }, config.secret, {
+                expiresIn: 86400 // 24 heures
+            });
 
-        user.then((users) => {
-            if (bcrypt.compare(req.body.password, users.password)){
+            if (bcrypt.compare(req.body.password, user.password)){
                 res.status(200).send({
                     id: user.id,
                     name: user.name,
