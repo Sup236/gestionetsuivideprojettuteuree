@@ -7,48 +7,51 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 exports.signUp = async (req, res) => {
-    try{
+    try {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
         users.create(req, res, hashedPassword);
 
         res.status(201).send();
-    }catch {
+    } catch {
         res.status(500).send();
     }
 }
 
 exports.signIn = (req, res) => {
-    try{
-        User.findOne({
-            where: {name: req.body.name},
-        }).then((user) => {
-            let token = jwt.sign({ id: user.id }, config.secret, {
-                expiresIn: 86400 // 24 heures
-            });
+    User.findOne({
+        where: {name: req.body.name},
+    }).then((user) => {
+        if (!user) {
+            res.status(404).send({message: "L'utilisateur n'existe pas"});
+        }
 
-            if (bcrypt.compare(req.body.password, user.password)){
-                res.status(200).send({
-                    id: user.id,
-                    name: user.name,
-                    firstName: user.firstName,
-                    email: user.email,
-                    role: user.role,
-                    accessToken: token
-                });
-            }else{
-                res.redirect('/signIn').send({
-                    message: "Mot de passe incorrecte"
-                });
-            }
-        })
-            .catch((err) => {
-                console.log(">> L'utilisateur avec le nom: "+req.body.name+" n'a pas été trouvée: ", err);
-            });
+        let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
 
-    }catch(e) {
-        console.log(e);
-        res.status(500).send(e);
-    }
-}
+        if (!passwordIsValid) {
+            res.status(401).send({
+                accessToken: null,
+                message: "Mot de passe invalide !"
+            });
+        }
+
+        let token = jwt.sign({id: user.id}, config.secret, {
+            expiresIn: 86400 // 24 heures
+        });
+
+        users.getRole(user.id).then(role => {
+            res.status(200).send({
+                id: user.id,
+                name: user.name,
+                firstName: user.firstName,
+                email: user.email,
+                role: role,
+                accessToken: token,
+            });
+        });
+    })
+        .catch((err) => {
+            console.log(">> L'utilisateur avec le nom: " + req.body.name + " n'a pas été trouvée: ", err);
+        });
+};

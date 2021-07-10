@@ -63,7 +63,7 @@ const authJwt = {
     verifyToken: verifyToken,
     isAdmin: isAdmin,
     isEnseignant: isEnseignant,
-    isEtudiant: isEtudiant
+    isEtudiant: isEtudiant,
 };
 
 module.exports = authJwt;

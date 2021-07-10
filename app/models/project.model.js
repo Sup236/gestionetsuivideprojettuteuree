@@ -10,7 +10,19 @@ module.exports = (sequelize, DataTypes) => {
 
         etat: {
             type: DataTypes.BOOLEAN
-        }
+        },
+
+        noteSoutenance: {
+            type: DataTypes.DOUBLE
+        },
+
+        noteRapport: {
+            type: DataTypes.DOUBLE
+        },
+
+        noteTechnique: {
+            type: DataTypes.DOUBLE
+        },
     });
 };
 
