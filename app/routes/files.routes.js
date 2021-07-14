@@ -1,14 +1,11 @@
 module.exports = app => {
-    const files = require("../controllers/file.controller");
-    const crypto = require('crypto');
+    const authJwt = require("../middleware/authJwt");
+    const files = require("../controllers/file.controlleur");
+    const fileUpload = require("express-fileupload")
+
+    app.use(fileUpload);
 
     app.post("/enseignant/projects:id", files.mkdirProject);
 
-    app.post("/enseignant/projects:id/upload",function (req, res) {
-        const nameDirectory = crypto.createHash("md5").update(req.body.projects.sujet).digest('hex');
-        var multer = require('multer');
-        var upload = multer({dest: `app/controllers/files/${nameDirectory}/`});
-
-        upload.single('test');
-    }, files.upload);
-};
+    app.post('/enseignant/projects:id/upload', files.upload);
+}
