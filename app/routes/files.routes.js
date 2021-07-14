@@ -7,5 +7,5 @@ module.exports = app => {
 
     app.post("/enseignant/projects:id", files.mkdirProject);
 
-    app.post('/enseignant/projects:id/upload', files.upload);
+    app.post('/enseignant/projects:id/upload',[authJwt.verifyToken], files.upload);
 }
