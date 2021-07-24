@@ -1,5 +1,6 @@
 module.exports = app => {
     const projects = require("../controllers/project.controller");
+    const authJwt = require("../middleware/authJwt");
 
     app.get("/enseignant", projects.findAll);
 
