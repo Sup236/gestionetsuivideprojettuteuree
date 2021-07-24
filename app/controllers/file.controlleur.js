@@ -1,10 +1,13 @@
 const fs = require('fs');
 const fsPromises = fs.promises;
 const crypto = require('crypto');
+const db = require("../models");
+const Project = db.projects;
+const mime = require('mime');
 
 exports.mkdirProject = (req,res) => {
     const nameDirectory = crypto.createHash("md5").update(req.body.sujet).digest('hex');
-    return fsPromises.mkdir(`app/controllers/files/${nameDirectory}`,{recursive: true})
+    return fsPromises.mkdir(`app/assets/files/${nameDirectory}`,{recursive: true})
         .then(function() {
             res.send({ message: 'Directory created successfully' });
         })
@@ -14,30 +17,80 @@ exports.mkdirProject = (req,res) => {
 };
 
 exports.upload = async (req, res) => {
-    //const nameDirectory = crypto.createHash("md5").update(req.body.sujet).digest('hex');
-    console.log(req)
-    try {
-        if(!req.files) {
-            res.send({
-                status: false,
-                message: 'No file uploaded'
-            });
-        } else {
-            let uploadFile = req.files.uploadFile;
+    Project.findByPk(req.params.id)
+        .then(data => {
+            const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+            try {
+                if(!req.files) {
+                    res.send({
+                        status: false,
+                        message: 'No file uploaded'
+                    });
+                } else {
+                    let uploadFile = req.files.uploadFile;
 
-            await uploadFile.mv('app/controllers/files/' + uploadFile.name);
+                    uploadFile.mv(`app/assets/files/${nameDirectory}/` + uploadFile.name);
 
-            res.send({
-                status: true,
-                message: 'File is uploaded',
-                data: {
-                    name: uploadFile.name,
-                    mimetype: uploadFile.mimetype,
-                    size: uploadFile.size
+                    res.send({
+                        status: true,
+                        message: 'File is uploaded',
+                        data: {
+                            name: uploadFile.name,
+                            mimetype: uploadFile.mimetype,
+                            size: uploadFile.size
+                        }
+                    });
                 }
+            } catch (err) {
+                res.status(500).send(err);
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Problème pour trouver le projet avec l'id " + req.params.id
             });
-        }
-    } catch (err) {
-        res.status(500).send(err);
-    }
-}
+        });
+};
+
+exports.listFiles = (req, res) => {
+    const baseUrl = req.get('host');
+    return Project.findByPk(req.params.id)
+        .then(data => {
+            const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+            fs.readdir(`app/assets/files/${nameDirectory}/`, function (err, files) {
+                if (err) {
+                    res.status(500).send({
+                        message: "Unable to scan files!",
+                    })
+                }
+
+                let fileInfos = [];
+
+                files.forEach((file) => {
+                    fileInfos.push({
+                        name: file,
+                        url: baseUrl+`/app/assets/files/${nameDirectory}/`+file
+                    });
+                });
+
+                res.status(200).send(fileInfos);
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Problème pour trouver le projet avec l'id " + req.params.id
+            });
+        });
+};
+
+exports.downloadFile = (req, res) => {
+    return Project.findByPk(req.params.id).then(data => {
+        const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+        const nameFile = req.params.nameFile;
+
+        let mimeType = mime.getType(`app/assets/files/${nameDirectory}/`+nameFile);
+        res.setHeader('Content-Type', mimeType);
+
+        res.download(`app/assets/files/${nameDirectory}/`+nameFile);
+    })
+};
