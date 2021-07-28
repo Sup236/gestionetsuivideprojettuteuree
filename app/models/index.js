@@ -19,8 +19,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.projects = require("C:\\Users\\leogi\\Desktop\\PFE_Gestion du suivi des projets tuteurés\\Code Source\\gestionetsuivideprojettuteuree\\app\\models\\project.model.js")(sequelize, Sequelize);
-db.user = require("C:\\Users\\leogi\\Desktop\\PFE_Gestion du suivi des projets tuteurés\\Code Source\\gestionetsuivideprojettuteuree\\app\\models\\user.model.js")(sequelize,Sequelize);
+db.projects = require("./project.model")(sequelize, Sequelize);
+db.user = require("./user.model")(sequelize,Sequelize);
 
 db.user.belongsToMany(db.projects, {
     through: "projects_users",

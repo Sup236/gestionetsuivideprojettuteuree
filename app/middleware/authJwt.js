@@ -59,11 +59,24 @@ isEtudiant = (req, res, next) => {
     });
 };
 
+isEnseignantAndEtudiant = (req, res, next) => {
+    User.getRole(req.body.id).then(role => {
+        if (role === 2 || role === 1) {
+            next();
+            return;
+        }
+        res.status(403).send({
+            message: "Vous devez être enseignant ou etudiant"
+        });
+    });
+};
+
 const authJwt = {
     verifyToken: verifyToken,
     isAdmin: isAdmin,
     isEnseignant: isEnseignant,
-    isEtudiant: isEtudiant
+    isEtudiant: isEtudiant,
+    isEnseignantAndEtudiant: isEnseignantAndEtudiant,
 };
 
 module.exports = authJwt;

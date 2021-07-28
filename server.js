@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
+const fileUpload = require("express-fileupload");
 const app = express();
 
 app.use(express.json());
@@ -14,6 +14,9 @@ let corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
+app.use(fileUpload());
+
+
 
 const db = require("./app/models");
 
@@ -28,9 +31,10 @@ app.get('/', function (req, res) {
 
 const PORT = process.env.PORT || 8080;
 
-require("./app/routes/user.routes")(app)
-require("./app/routes/project.routes")(app)
-require("./app/routes/files.routes")(app)
+require("./app/routes/user.routes")(app);
+require("./app/routes/project.routes")(app);
+require("./app/routes/files.routes")(app);
+require("./app/routes/git.routes")(app);
 
 app.listen(PORT, () => {
     console.log(`Le serveur fonctionne sur le port: ${PORT}`);
