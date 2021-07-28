@@ -19,9 +19,5 @@ module.exports = (sequelize, DataTypes) => {
         role: {
             type: DataTypes.INTEGER
         },
-
-        gitAccessToken: {
-            type: DataTypes.STRING
-        }
     });
 };
