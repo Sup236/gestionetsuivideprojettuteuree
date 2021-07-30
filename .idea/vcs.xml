@@ -2,5 +2,11 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/[object Object]" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/assets/files/1c7612d003ca1a58c2e2bfe1073a5502" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/assets/files/1c7612d003ca1a58c2e2bfe1073a5502/gitProject" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/assets/files/a3de05ee78ee51ffe0281701d8234bf5/gitProject" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/assets/files/a73cb7e7c419a3ba91957441415860fd" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/assets/files/a73cb7e7c419a3ba91957441415860fd/gitProject" vcs="Git" />
   </component>
 </project>

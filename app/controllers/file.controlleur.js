@@ -68,10 +68,13 @@ exports.listFiles = (req, res) => {
                     let fileInfos = [];
 
                     files.forEach((file) => {
-                        fileInfos.push({
-                            name: file,
-                            url: baseUrl + `/app/assets/files/${nameDirectory}/` + file
-                        });
+                        let url = baseUrl + `/app/assets/files/${nameDirectory}/` + file
+                        if (file !== 'gitProject' && file !== '.git'){
+                            fileInfos.push({
+                                name: file,
+                                url: url
+                            });
+                        }
                     });
 
                     res.status(200).send(fileInfos);
