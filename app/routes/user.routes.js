@@ -17,9 +17,9 @@ module.exports = app => {
 
     app.get('/admin',[authJwt.verifyToken], users.findAll);
 
-    app.get('/enseignant/getEtudiants', [authJwt.verifyToken],users.findAllEtudiant);
+    app.get('/enseignant/getEtudiants',users.findAllEtudiant);
 
-    app.get('/enseignant/getEnseignants', [authJwt.verifyToken],users.findAllEnseignant);
+    app.get('/enseignant/getEnseignants',users.findAllEnseignant);
 
     app.post('/admin', [authJwt.verifyToken], auth.signUp);
 
@@ -29,5 +29,5 @@ module.exports = app => {
 
     app.put('/admin:id', [authJwt.verifyToken],users.update);
 
-    app.post("/enseignant/addUser", [authJwt.verifyToken],users.addProject);
+    app.post("/enseignant/addUser",users.addProject);
 };

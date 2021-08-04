@@ -5,23 +5,42 @@ const db = require("../models");
 const Project = db.projects;
 const mime = require('mime');
 
-exports.mkdirProject = (req,res) => {
-    const nameDirectory = crypto.createHash("md5").update(req.body.sujet).digest('hex');
-    return fsPromises.mkdir(`app/assets/files/${nameDirectory}`,{recursive: true})
-        .then(function() {
-            res.send({ message: 'Directory created successfully' });
+exports.mkdirProject = async (req, res) => {
+    const nameDirectory = crypto.createHash("md5").update(req.body.sujet + req.body.id).digest('hex');
+    return await fsPromises.mkdir(`app/assets/files/${nameDirectory}`, {recursive: true})
+        .then(function () {
+            res.send({message: 'Directory created successfully'});
         })
-        .catch(function() {
-            res.send({ message: 'failed to create directory' });
+        .catch(function () {
+            res.send({message: 'failed to create directory'});
+        });
+};
+
+exports.rmdirProject = (req, res) => {
+    Project.findByPk(req.params.id)
+        .then(data => {
+            const nameDirectory = crypto.createHash("md5").update(data.sujet + req.params.id).digest('hex');
+            return fsPromises.rmdir(`app/assets/files/${nameDirectory}`, {recursive: true})
+                .then(function () {
+                    res.send({message: 'Directory deleted successfully'});
+                })
+                .catch(function () {
+                    res.send({message: 'failed to delete directory'});
+                });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Problème pour trouver le projet avec l'id " + req.params.id
+            });
         });
 };
 
 exports.upload = async (req, res) => {
     Project.findByPk(req.params.id)
         .then(data => {
-            const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+            const nameDirectory = crypto.createHash("md5").update(data.sujet + req.params.id).digest('hex');
             try {
-                if(!req.files) {
+                if (!req.files) {
                     res.send({
                         status: false,
                         message: 'No file uploaded'
@@ -56,7 +75,7 @@ exports.listFiles = (req, res) => {
     const baseUrl = req.get('host');
     return Project.findByPk(req.params.id)
         .then(data => {
-            const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+            const nameDirectory = crypto.createHash("md5").update(data.sujet + req.params.id).digest('hex');
 
             fs.readdir(`app/assets/files/${nameDirectory}/`, function (err, files) {
                 if (err) {
@@ -69,7 +88,7 @@ exports.listFiles = (req, res) => {
 
                     files.forEach((file) => {
                         let url = baseUrl + `/app/assets/files/${nameDirectory}/` + file
-                        if (file !== 'gitProject' && file !== '.git'){
+                        if (file !== 'gitProject' && file !== '.git') {
                             fileInfos.push({
                                 name: file,
                                 url: url
@@ -90,12 +109,12 @@ exports.listFiles = (req, res) => {
 
 exports.downloadFile = (req, res) => {
     return Project.findByPk(req.params.id).then(data => {
-        const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+        const nameDirectory = crypto.createHash("md5").update(data.sujet + req.body.id).digest('hex');
         const nameFile = req.params.nameFile;
 
-        let mimeType = mime.getType(`app/assets/files/${nameDirectory}/`+nameFile);
+        let mimeType = mime.getType(`app/assets/files/${nameDirectory}/` + nameFile);
         res.setHeader('Content-Type', mimeType);
 
-        res.download(`app/assets/files/${nameDirectory}/`+nameFile);
+        res.download(`app/assets/files/${nameDirectory}/` + nameFile);
     })
 };

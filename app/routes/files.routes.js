@@ -3,6 +3,8 @@ module.exports = app => {
 
     app.post("/enseignant/projects:id", files.mkdirProject);
 
+    app.post("/enseignant/project:id/delete", files.rmdirProject);
+
     app.post('/enseignant/projects:id/upload', files.upload);
 
     app.get('/enseignant/projects:id/files', files.listFiles);

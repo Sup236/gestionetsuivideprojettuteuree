@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         noteTechnique: {
             type: DataTypes.DOUBLE
         },
+
+        depot: {
+            type: DataTypes.STRING
+        }
     });
 };
 
