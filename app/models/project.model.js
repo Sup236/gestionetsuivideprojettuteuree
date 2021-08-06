@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
 
         depot: {
             type: DataTypes.STRING
+        },
+
+        clone: {
+            type: DataTypes.STRING
         }
     });
 };

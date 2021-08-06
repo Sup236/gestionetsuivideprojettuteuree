@@ -5,4 +5,6 @@ module.exports = app => {
 
     app.post("/enseignant/projects:id/pushFile", gitCommand.uploadForPush);
 
+    app.get("/enseignant/projects:id/lastCommit", gitCommand.lastCommit);
+
 }

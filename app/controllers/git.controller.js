@@ -4,6 +4,7 @@ const db = require("../models");
 const fs = require("fs");
 const path = require("path");
 const Project = db.projects;
+const User = db.user;
 const fsPromises = fs.promises;
 
 exports.initialize = (req, res) => {
@@ -39,6 +40,22 @@ exports.initialize = (req, res) => {
                     console.log(err);
                     res.send(err);
                 })
+        })
+};
+
+exports.lastCommit = (req, res) => {
+    Project.findByPk(req.params.id)
+        .then(async data => {
+            const nameDirectory = crypto.createHash("md5").update(data.sujet).digest('hex');
+            let gitFolder = path.join(__dirname, '..', '..', `./app/assets/files/${nameDirectory}/gitProject/`);
+
+            const git = simpleGit(gitFolder, {config: ['http.proxy=socks5h://127.0.0.1:31415']});
+
+            await git.log().then((result) => {
+                res.send(result);
+            }).catch((err) => {
+                console.log(err)
+            })
         })
 }
 
