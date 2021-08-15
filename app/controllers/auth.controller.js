@@ -6,6 +6,16 @@ const User = db.user;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+/**
+ * Cette fonction permet de crypter le mot de passe choisie par l'utilisateur
+ * Elle est également asynchorne pour pouvoir choisir de faire le cryptage avant la creation
+ * Une fois le mot de passe il est transmis avec le reste des information reçu par la vue à la fonction create
+ * Cette fonction se trouve dans le user.controller.js
+ *
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.signUp = async (req, res) => {
     try {
         const salt = await bcrypt.genSalt();
@@ -19,6 +29,15 @@ exports.signUp = async (req, res) => {
     }
 }
 
+/**
+ * Cette fonction va permetre l'authentification d'un utilisateur
+ * Dans un premier temps on cherche l'utilisateur par son nom dans la base de donnée
+ * S'il existe on compare le mot de passe envoyer par la vue et celui ce trouvant dans la base de donnée
+ * Puis on créer un jeton "token" avec la clé secrete ce trouvant dans config/auth.config.js
+ * Enfin on récupère le rôle de l'utilisateur puis on le transmet à la vue avec toute les information de ce dernier et le jeton d'authentification
+ * @param req
+ * @param res
+ */
 exports.signIn = (req, res) => {
     User.findOne({
         where: {name: req.body.name},

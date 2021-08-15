@@ -2,6 +2,14 @@ const db = require("../models");
 const Project = db.projects;
 const User = db.user;
 
+/**
+ * Cette fonction créé un utilisateur en utilisant les données récupérer sur la vue
+ * Elle retourne le résultat de la fonction create généré par sequelize
+ * @param req
+ * @param res
+ * @param hashedPassword
+ * @returns {Promise<T>}
+ */
 exports.create = (req, res, hashedPassword) => {
     return User.create({
         name: req.body.name,
@@ -19,13 +27,31 @@ exports.create = (req, res, hashedPassword) => {
         });
 };
 
+
+/**
+ * Cette fonction récupère tous les utilisateurs de la base de donnée en incluant leur projets
+ * Elle les renvoie par la suite à la vue via res.send
+ * @param req
+ * @param res
+ * @returns {Promise<unknown>}
+ */
 exports.findAll = (req, res) => {
     return User.findAll({
         include: [
             {
                 model: Project,
                 as: "projects",
-                attributes: ["id", "sujet", "annee", "etat"],
+                attributes: [
+                    "id",
+                    "sujet",
+                    "annee",
+                    "etat",
+                    "noteSoutenance",
+                    "noteRapport",
+                    "noteTechnique",
+                    "depot",
+                    "clone"
+                ],
                 through: {
                     attributes: ["users_id", "projects_id"],
                 }
@@ -40,6 +66,13 @@ exports.findAll = (req, res) => {
         });
 };
 
+/**
+ * Cette fonction est similaire à la précédante
+ * Seul exeption elle renvoie seulement les utilisateurs avec le rôle 1 : etudiant
+ * @param req
+ * @param res
+ * @returns {Promise<unknown>}
+ */
 exports.findAllEtudiant = (req, res) => {
     return User.findAll({
         where: { role: 1 },
@@ -47,7 +80,17 @@ exports.findAllEtudiant = (req, res) => {
             {
                 model: Project,
                 as: "projects",
-                attributes: ["id", "sujet", "annee", "etat"],
+                attributes: [
+                    "id",
+                    "sujet",
+                    "annee",
+                    "etat",
+                    "noteSoutenance",
+                    "noteRapport",
+                    "noteTechnique",
+                    "depot",
+                    "clone"
+                ],
                 through: {
                     attributes: ["users_id", "projects_id"],
                 }
@@ -62,6 +105,13 @@ exports.findAllEtudiant = (req, res) => {
         });
 };
 
+/**
+ * Cette fonction est similaire à la précédante
+ * Seul exeption elle renvoie seulement les utilisateurs avec le rôle 2 : enseignant
+ * @param req
+ * @param res
+ * @returns {Promise<unknown>}
+ */
 exports.findAllEnseignant = (req, res) => {
     return User.findAll({
         where: { role: 2 },
@@ -69,7 +119,17 @@ exports.findAllEnseignant = (req, res) => {
             {
                 model: Project,
                 as: "projects",
-                attributes: ["id", "sujet", "annee", "etat"],
+                attributes: [
+                    "id",
+                    "sujet",
+                    "annee",
+                    "etat",
+                    "noteSoutenance",
+                    "noteRapport",
+                    "noteTechnique",
+                    "depot",
+                    "clone"
+                ],
                 through: {
                     attributes: ["users_id", "projects_id"],
                 }
@@ -84,13 +144,30 @@ exports.findAllEnseignant = (req, res) => {
         });
 };
 
+/**
+ * Cette fonction utilise la fonction généré par sequelize findByPk
+ * Elle cherche un utilisateur par son id
+ * @param req
+ * @param res
+ * @returns {Promise<T>}
+ */
 exports.findById = (req, res) => {
     return User.findByPk(req.body.id, {
         include: [
             {
                 model: Project,
                 as: "projects",
-                attributes: ["id", "sujet", "annee", "etat"],
+                attributes: [
+                    "id",
+                    "sujet",
+                    "annee",
+                    "etat",
+                    "noteSoutenance",
+                    "noteRapport",
+                    "noteTechnique",
+                    "depot",
+                    "clone"
+                ],
                 through: {
                     attributes: ["users_id", "projects_id"],
                 }
@@ -105,10 +182,36 @@ exports.findById = (req, res) => {
         });
 };
 
+/**
+ * Cette fonction utilise la fonction généré par sequelize findByOne
+ * Elle cherche un utilisateur par son name
+ * @param req
+ * @param res
+ */
 exports.findByName = (req, res) => {
     const name = req.body.name;
     User.findOne({
         where: {name: name},
+        include: [
+            {
+                model: Project,
+                as: "projects",
+                attributes: [
+                    "id",
+                    "sujet",
+                    "annee",
+                    "etat",
+                    "noteSoutenance",
+                    "noteRapport",
+                    "noteTechnique",
+                    "depot",
+                    "clone"
+                ],
+                through: {
+                    attributes: ["users_id", "projects_id"],
+                }
+            },
+        ],
     }).then((user) => {
         res.send(user);
     }).catch((err) => {
@@ -118,6 +221,13 @@ exports.findByName = (req, res) => {
     });
 };
 
+/**
+ * Cette fonction permet d'ajouté un projet à un utilisateur
+ * Elle utilise une autre fonction généré par belongToMany
+ * @param req
+ * @param res
+ * @returns {Promise<T>}
+ */
 exports.addProject = (req,res) =>{
     const userId = req.body.userId;
     const projectId = req.body.projectId;
@@ -143,11 +253,16 @@ exports.addProject = (req,res) =>{
         });
 };
 
+/**
+ * Cette fonction utilise la fonction généré par sequelize pour mettre a jour un utilisateur
+ * @param req
+ * @param res
+ */
 exports.update = (req,res) => {
     const id = req.params.id;
 
     User.update(req.body,{
-        where: { id: id }
+        where: { id: id },
     })
         .then((result) => {
             if (result > -1){
@@ -162,11 +277,16 @@ exports.update = (req,res) => {
         })
         .catch((err) => {
             res.status(500).send({
-                message: "erreur lors de la mise a jour de l'utilisateur d'id: "+id
+                message: "erreur lors de la mise a jour de l'utilisateur d'id: "+id, err
             });
         });
 };
 
+/**
+ * Cette fonction utilise la fonction destroy généré par sequelize pour supprimé un utilisateur
+ * @param req
+ * @param res
+ */
 exports.delete = (req, res) => {
     const id = req.params.id;
 
@@ -183,6 +303,11 @@ exports.delete = (req, res) => {
         })
 }
 
+/**
+ * Cette fonction renvoie le rôle de l'utilisateur
+ * @param userId
+ * @returns {Promise<T>}
+ */
 exports.getRole = (userId) =>{
     return User.findByPk(userId).then((user) => {
         if (user.role > -1 && user.role < 6){
@@ -190,13 +315,5 @@ exports.getRole = (userId) =>{
         }
     }).catch((err) => {
         console.log(">> Problème pour trouver le role de l'utilisateur", err);
-    })
-};
-
-exports.setRole = (userId, newRole) => {
-    return User.findByPk(userId).then((user) => {
-        user.role = newRole;
-    }).catch((err) => {
-        console.log(">> Problème lors de l'edition du role", err);
     })
 };

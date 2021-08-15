@@ -3,6 +3,13 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const User = db.user;
 
+/**
+ * Fonction pour vérifier le jeton de sécurité
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
 verifyToken = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
@@ -23,6 +30,13 @@ verifyToken = (req, res, next) => {
     });
 };
 
+/**
+ * Fonction qui vérifie le rôle de l'utilisateur
+ * Autorise l'accès au admin uniquement
+ * @param req
+ * @param res
+ * @param next
+ */
 isAdmin = (req, res, next) => {
     User.getRole(req.body.id).then(role => {
         if (role === 3) {
@@ -35,6 +49,13 @@ isAdmin = (req, res, next) => {
     });
 };
 
+/**
+ * Fonction qui vérifie le rôle de l'utilisateur
+ * Autorise l'accès au enseignant uniquement
+ * @param req
+ * @param res
+ * @param next
+ */
 isEnseignant = (req, res, next) => {
     User.getRole(req.body.id).then(role => {
         if (role === 2) {
@@ -47,6 +68,13 @@ isEnseignant = (req, res, next) => {
     });
 };
 
+/**
+ * Fonction qui vérifie le rôle de l'utilisateur
+ * Autorise l'accès au étudiant uniquement
+ * @param req
+ * @param res
+ * @param next
+ */
 isEtudiant = (req, res, next) => {
     User.getRole(req.body.id).then(role => {
         if (role === 1) {
@@ -59,6 +87,13 @@ isEtudiant = (req, res, next) => {
     });
 };
 
+/**
+ *  * Fonction qui vérifie le rôle de l'utilisateur
+ * Autorise l'accès au enseignant et au étudiant
+ * @param req
+ * @param res
+ * @param next
+ */
 isEnseignantAndEtudiant = (req, res, next) => {
     User.getRole(req.body.id).then(role => {
         if (role === 2 || role === 1) {
@@ -71,6 +106,14 @@ isEnseignantAndEtudiant = (req, res, next) => {
     });
 };
 
+/**
+ * Création d'un objet contenant les fonction ci-dessus
+ * @type {{verifyToken: ((function(*, *, *): *)|*),
+ * isEnseignant: isEnseignant,
+ * isAdmin: isAdmin,
+ * isEtudiant: isEtudiant,
+ * isEnseignantAndEtudiant: isEnseignantAndEtudiant}}
+ */
 const authJwt = {
     verifyToken: verifyToken,
     isAdmin: isAdmin,
@@ -79,4 +122,4 @@ const authJwt = {
     isEnseignantAndEtudiant: isEnseignantAndEtudiant,
 };
 
-module.exports = authJwt;
+module.exports = authJwt; // export de l'objet authJwt pour l'utilisé dans l'application

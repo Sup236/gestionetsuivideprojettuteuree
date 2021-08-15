@@ -1,3 +1,12 @@
+/**
+ * Dans ce fichier nous configurons la base de donnée
+ * @type {{dialect: string,
+ * PASSWORD: string,
+ * pool: {min: number, max: number, idle: number, acquire: number},
+ * HOST: string,
+ * USER: string,
+ * DB: string}}
+ */
 module.exports = {
     HOST: "localhost",
     USER: "root",
